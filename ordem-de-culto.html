@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ordem de Culto — Sistema de Celebração</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+  :root {
+    --bg: #0f0e0d;
+    --bg2: #181714;
+    --bg3: #201e1a;
+    --bg4: #2a2722;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #f0ebe3;
+    --text2: #a09888;
+    --text3: #6b6356;
+    --gold: #c8a96e;
+    --gold2: #e8cc99;
+    --gold-dim: rgba(200,169,110,0.12);
+    --teal: #4db89a;
+    --teal-dim: rgba(77,184,154,0.12);
+    --blue: #6ea8e8;
+    --blue-dim: rgba(110,168,232,0.12);
+    --amber: #e8a84e;
+    --amber-dim: rgba(232,168,78,0.12);
+    --rose: #e87a8a;
+    --rose-dim: rgba(232,122,138,0.12);
+    --gray-dim: rgba(255,255,255,0.06);
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── Top bar ── */
+  .topbar {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topbar-brand {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--gold2);
+    letter-spacing: .01em;
+    flex-shrink: 0;
+  }
+  .topbar-brand span { color: var(--text2); font-size: 13px; font-family: 'DM Sans', sans-serif; font-style: normal; margin-left: 8px; }
+  .topbar-spacer { flex: 1; }
+  .topbar-actions { display: flex; gap: 8px; align-items: center; }
+
+  /* ── Tabs ── */
+  .tabs-wrap {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    gap: 0;
+  }
+  .tab-btn {
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    padding: 12px 18px;
+    border: none;
+    background: transparent;
+    color: var(--text2);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: color .2s, border-color .2s;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--gold2); border-bottom-color: var(--gold); font-weight: 500; }
+  .tab-btn i { font-size: 15px; }
+
+  /* ── Main ── */
+  .main { padding: 1.5rem 2rem 3rem; max-width: 1400px; margin: 0 auto; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ── Section header ── */
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--gold2);
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title i { font-size: 20px; color: var(--gold); }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .card-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--text3);
+    margin-bottom: .75rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .card-label i { font-size: 13px; color: var(--gold); }
+
+  /* ── Form grid ── */
+  .form-grid { display: grid; gap: 10px; margin-bottom: 10px; }
+  .form-grid.g2 { grid-template-columns: 1fr 1fr; }
+  .form-grid.g3 { grid-template-columns: 1fr 1fr 1fr; }
+  .form-grid.g1 { grid-template-columns: 1fr; }
+  .fg label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--text3);
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  .fg input, .fg select, .fg textarea {
+    width: 100%;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    padding: 8px 11px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    transition: border-color .2s, background .2s;
+  }
+  .fg input:focus, .fg select:focus, .fg textarea:focus {
+    outline: none;
+    border-color: var(--gold);
+    background: var(--bg4);
+  }
+  .fg select option { background: #201e1a; color: #f0ebe3; }
+
+  /* ── Buttons ── */
+  .btn {
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    padding: 7px 14px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border2);
+    background: var(--bg3);
+    color: var(--text);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background .2s, border-color .2s, color .2s;
+    white-space: nowrap;
+  }
+  .btn:hover { background: var(--bg4); border-color: var(--border2); }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn i { font-size: 14px; }
+
+  .btn-gold {
+    background: var(--gold-dim);
+    border-color: rgba(200,169,110,.3);
+    color: var(--gold2);
+  }
+  .btn-gold:hover { background: rgba(200,169,110,.2); }
+
+  .btn-teal {
+    background: var(--teal-dim);
+    border-color: rgba(77,184,154,.3);
+    color: var(--teal);
+  }
+  .btn-teal:hover { background: rgba(77,184,154,.2); }
+
+  .btn-rose {
+    background: transparent;
+    border-color: rgba(232,122,138,.2);
+    color: var(--rose);
+  }
+  .btn-rose:hover { background: var(--rose-dim); }
+
+  /* ── Toolbar ── */
+  .toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: .75rem; }
+
+  /* ── Note box ── */
+  .note {
+    font-size: 12px;
+    padding: 8px 12px;
+    background: rgba(200,169,110,.07);
+    border: 1px solid rgba(200,169,110,.18);
+    border-radius: var(--radius);
+    color: var(--gold);
+    margin-bottom: .75rem;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .note i { font-size: 14px; flex-shrink: 0; }
+
+  /* ── Legend ── */
+  .legend { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: .75rem; }
+  .leg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text2); }
+  .leg-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ── OC Table ── */
+  .tbl-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--bg2); }
+  table.oc {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    table-layout: fixed;
+    min-width: 1100px;
+  }
+  table.oc th {
+    background: var(--bg3);
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--text3);
+    padding: 8px 6px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    white-space: nowrap;
+  }
+  table.oc td {
+    padding: 3px 4px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  table.oc tr:last-child td { border-bottom: none; }
+  table.oc tr:hover td { background: rgba(255,255,255,.025); }
+
+  table.oc tr.tipo-musica td:first-child { border-left: 3px solid var(--teal); }
+  table.oc tr.tipo-palavra td:first-child { border-left: 3px solid var(--blue); }
+  table.oc tr.tipo-video td:first-child { border-left: 3px solid var(--amber); }
+  table.oc tr.tipo-encerramento td:first-child { border-left: 3px solid var(--rose); }
+  table.oc tr.tipo-outro td:first-child { border-left: 3px solid var(--text3); }
+
+  table.oc tr.dragging { opacity: .3; }
+  table.oc tr.drag-over td { background: rgba(200,169,110,.08); }
+
+  .ci {
+    font-size: 11.5px;
+    font-family: 'DM Sans', sans-serif;
+    padding: 4px 5px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text);
+    width: 100%;
+    min-width: 0;
+    transition: border-color .15s, background .15s;
+  }
+  .ci:hover { border-color: var(--border); background: var(--bg3); }
+  .ci:focus { outline: none; border-color: var(--gold); background: var(--bg4); }
+  .ci.center { text-align: center; }
+  .ci option { background: #201e1a; }
+
+  .grip {
+    color: var(--text3);
+    cursor: grab;
+    font-size: 15px;
+    padding: 0 4px;
+    display: flex;
+    align-items: center;
+  }
+  .del-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text3);
+    font-size: 14px;
+    padding: 3px 5px;
+    border-radius: 5px;
+    transition: color .15s, background .15s;
+  }
+  .del-btn:hover { color: var(--rose); background: var(--rose-dim); }
+
+  /* ── Bottom bar ── */
+  .bottom-bar {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    padding: .875rem 1.25rem;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    margin-top: .75rem;
+    flex-wrap: wrap;
+  }
+  .stat-l { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .07em; }
+  .stat-v { font-size: 20px; font-weight: 300; color: var(--gold2); font-family: 'DM Serif Display', serif; }
+
+  /* ── Status bar ── */
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    padding: 8px 12px;
+    border-radius: var(--radius);
+    margin-top: .5rem;
+    background: var(--bg3);
+    color: var(--text2);
+    border: 1px solid var(--border);
+    transition: all .3s;
+  }
+  .status-ok { background: var(--teal-dim); color: var(--teal); border-color: rgba(77,184,154,.25); }
+  .status-err { background: var(--rose-dim); color: var(--rose); border-color: rgba(232,122,138,.25); }
+  .status-send { background: var(--blue-dim); color: var(--blue); border-color: rgba(110,168,232,.25); }
+  .spinner { width: 13px; height: 13px; border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Pessoas/Bandas list ── */
+  .list-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 6px;
+    transition: border-color .15s;
+  }
+  .list-item:hover { border-color: var(--border2); }
+  .list-item-main { flex: 1; }
+  .list-item-name { font-size: 13px; color: var(--text); font-weight: 500; }
+  .list-item-sub { font-size: 11px; color: var(--text2); margin-top: 1px; }
+  .avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--blue-dim); color: var(--blue);
+    font-size: 11px; font-weight: 500;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; border: 1px solid rgba(110,168,232,.2);
+  }
+  .avatar.banda { background: var(--teal-dim); color: var(--teal); border-color: rgba(77,184,154,.2); }
+
+  .empty {
+    color: var(--text3);
+    font-size: 13px;
+    padding: 2rem;
+    text-align: center;
+    font-style: italic;
+  }
+
+  /* ── GS Config panel ── */
+  .gs-panel {
+    background: rgba(110,168,232,.06);
+    border: 1px solid rgba(110,168,232,.18);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.25rem;
+    margin-top: 1rem;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .gs-panel input {
+    flex: 1;
+    min-width: 300px;
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    padding: 7px 10px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    color: var(--text);
+  }
+  .gs-panel input:focus { outline: none; border-color: var(--blue); }
+  .gs-panel-label { font-size: 12px; color: var(--blue); display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+  /* ── Print ── */
+  @media print {
+    .topbar, .tabs-wrap, .toolbar, .note, .status-bar, .gs-panel, .del-btn, .grip, .btn { display: none !important; }
+    body { background: white; color: black; }
+    .card, .tbl-wrap, .bottom-bar { border-color: #ccc; background: white; }
+    table.oc th { background: #f5f5f5; color: #333; }
+    .stat-v { color: #111; }
+    .ci { color: black; }
+    .tbl-wrap { overflow: visible; }
+    table.oc { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-brand">
+    <i class="ti ti-church" style="font-size:20px;vertical-align:-3px;margin-right:6px"></i>
+    Ordem de Culto
+    <span>Sistema de Celebração</span>
+  </div>
+  <div class="topbar-spacer"></div>
+  <div class="topbar-actions">
+    <button class="btn btn-teal" id="btn-gs-top" onclick="sendGSheets()">
+      <i class="ti ti-table"></i> Salvar no Google Sheets
+    </button>
+    <button class="btn" onclick="exportCSV()"><i class="ti ti-download"></i> CSV</button>
+    <button class="btn" onclick="window.print()"><i class="ti ti-printer"></i> Imprimir</button>
+  </div>
+</header>
+
+<nav class="tabs-wrap">
+  <button class="tab-btn active" onclick="showTab('oc',this)">
+    <i class="ti ti-list-check"></i> Ordem de Culto
+  </button>
+  <button class="tab-btn" onclick="showTab('bandas',this)">
+    <i class="ti ti-music"></i> Bandas
+  </button>
+  <button class="tab-btn" onclick="showTab('pessoas',this)">
+    <i class="ti ti-users"></i> Pessoas
+  </button>
+  <button class="tab-btn" onclick="showTab('config',this)">
+    <i class="ti ti-settings"></i> Configurações
+  </button>
+</nav>
+
+<main class="main">
+
+  <!-- ══ ABA: ORDEM DE CULTO ══ -->
+  <div id="tab-oc" class="panel active">
+
+    <div class="card">
+      <div class="card-label"><i class="ti ti-building-church"></i> Cabeçalho do culto</div>
+      <div class="form-grid g3">
+        <div class="fg"><label>Campus / Local</label><input type="text" id="h-campus" value="Campus Colina — Auditório Principal"></div>
+        <div class="fg"><label>Data e horário</label><input type="text" id="h-data" value="15 de Maio de 2026 — 20:00hs"></div>
+        <div class="fg"><label>Tema / Série</label><input type="text" id="h-tema" value="30 Semanas — Mensagem 06/30"></div>
+      </div>
+      <div class="form-grid g3">
+        <div class="fg"><label>Gestão de celebração</label><input type="text" id="h-gc" value="Roberta Lucas / Thiago Costa"></div>
+        <div class="fg"><label>Mensagem</label><input type="text" id="h-msg" value="Mensagem 06/30"></div>
+        <div class="fg"><label>Total de semanas</label><input type="text" id="h-sem" value="30 Semanas"></div>
+      </div>
+      <div class="form-grid g1">
+        <div class="fg"><label>Aviso importante — telão central</label>
+          <input type="text" id="h-aviso" value='LEMBRAR TELÃO CENTRAL "FAMÍLIA PARA PERTENCER" EM CADA TRANSIÇÃO DE MOMENTO'>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <i class="ti ti-drag-drop"></i>
+      Arraste as linhas para reordenar. Clique em qualquer célula para editar diretamente.
+    </div>
+
+    <div class="legend">
+      <div class="leg"><div class="leg-dot" style="background:var(--teal)"></div>Música</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--blue)"></div>Palavra / Pregação</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--amber)"></div>Vídeo</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--rose)"></div>Encerramento</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--text3)"></div>Outro</div>
+    </div>
+
+    <div class="toolbar">
+      <button class="btn btn-gold" onclick="addRow()"><i class="ti ti-plus"></i> Novo momento</button>
+      <button class="btn btn-teal" id="btn-gs" onclick="sendGSheets()"><i class="ti ti-table"></i> Salvar no Google Sheets</button>
+      <button class="btn" onclick="exportCSV()"><i class="ti ti-download"></i> CSV</button>
+    </div>
+
+    <div class="tbl-wrap">
+      <table class="oc">
+        <colgroup>
+          <col style="width:26px">
+          <col style="width:58px">
+          <col style="width:54px">
+          <col style="width:155px">
+          <col style="width:115px">
+          <col style="width:90px">
+          <col style="width:110px">
+          <col style="width:95px">
+          <col style="width:100px">
+          <col style="width:100px">
+          <col style="width:105px">
+          <col style="width:26px">
+        </colgroup>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Duração</th>
+            <th>Horário</th>
+            <th>Momento / Música</th>
+            <th>Responsável</th>
+            <th>Vídeo / Som</th>
+            <th>Tipo de Momento</th>
+            <th>Telão Central</th>
+            <th>Transmissão</th>
+            <th>Vídeo / Dança / Luz</th>
+            <th>GC Suspenso</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="oc-body"></tbody>
+      </table>
+    </div>
+
+    <div class="bottom-bar">
+      <div><div class="stat-l">Duração total</div><div class="stat-v" id="tot-dur">—</div></div>
+      <div><div class="stat-l">Término previsto</div><div class="stat-v" id="tot-fim">—</div></div>
+      <div><div class="stat-l">Momentos</div><div class="stat-v" id="tot-n">0</div></div>
+    </div>
+
+    <div class="status-bar" id="status-bar">
+      <i class="ti ti-circle-check" style="font-size:14px"></i>
+      <span id="status-msg">Pronto — clique em "Salvar no Google Sheets" para sincronizar</span>
+    </div>
+  </div>
+
+  <!-- ══ ABA: BANDAS ══ -->
+  <div id="tab-bandas" class="panel">
+    <div class="section-title"><i class="ti ti-music"></i> Bandas cadastradas</div>
+    <div class="card">
+      <div class="card-label"><i class="ti ti-plus"></i> Nova banda</div>
+      <div class="form-grid g2">
+        <div class="fg"><label>Nome da banda</label><input type="text" id="b-nome" placeholder="Ex: Banda Samuel"></div>
+        <div class="fg"><label>Ministro líder</label><input type="text" id="b-lider" placeholder="Ex: Samuel Costa"></div>
+      </div>
+      <button class="btn btn-gold" onclick="addBanda()"><i class="ti ti-plus"></i> Adicionar banda</button>
+    </div>
+    <div id="lista-bandas"><div class="empty">Nenhuma banda cadastrada ainda.</div></div>
+  </div>
+
+  <!-- ══ ABA: PESSOAS ══ -->
+  <div id="tab-pessoas" class="panel">
+    <div class="section-title"><i class="ti ti-users"></i> Pessoas cadastradas</div>
+    <div class="card">
+      <div class="card-label"><i class="ti ti-user-plus"></i> Nova pessoa</div>
+      <div class="form-grid g3">
+        <div class="fg"><label>Nome completo</label><input type="text" id="p-nome" placeholder="Ex: Eloy Pedrosa"></div>
+        <div class="fg"><label>Função</label>
+          <select id="p-func">
+            <option value="">Selecione…</option>
+            <option>Pastor</option><option>Líder de Louvor</option><option>Pregador</option>
+            <option>Diácono</option><option>Intercessor</option><option>Comunicações</option>
+            <option>Voluntário</option><option>Outro</option>
+          </select>
+        </div>
+        <div class="fg"><label>Telefone (opcional)</label><input type="text" id="p-tel" placeholder="(12) 99999-0000"></div>
+      </div>
+      <button class="btn btn-gold" onclick="addPessoa()"><i class="ti ti-plus"></i> Adicionar pessoa</button>
+    </div>
+    <div id="lista-pessoas"><div class="empty">Nenhuma pessoa cadastrada ainda.</div></div>
+  </div>
+
+  <!-- ══ ABA: CONFIGURAÇÕES ══ -->
+  <div id="tab-config" class="panel">
+    <div class="section-title"><i class="ti ti-settings"></i> Configurações</div>
+    <div class="card">
+      <div class="card-label"><i class="ti ti-table"></i> Integração com Google Sheets</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:1rem;line-height:1.7">
+        Cole abaixo a URL do seu Google Apps Script (Web App deploy). Após salvar, todos os dados
+        da Ordem de Culto, Bandas e Pessoas serão enviados à planilha ao clicar em
+        <strong style="color:var(--teal)">"Salvar no Google Sheets"</strong>.
+      </p>
+      <div class="fg" style="margin-bottom:1rem">
+        <label>URL do Google Apps Script</label>
+        <input type="text" id="cfg-gsurl" placeholder="https://script.google.com/macros/s/…/exec">
+      </div>
+      <button class="btn btn-teal" onclick="saveConfig()"><i class="ti ti-device-floppy"></i> Salvar configuração</button>
+      <span id="cfg-status" style="font-size:12px;color:var(--teal);margin-left:10px;display:none">
+        <i class="ti ti-check"></i> Salvo!
+      </span>
+    </div>
+
+    <div class="card">
+      <div class="card-label"><i class="ti ti-code"></i> Código para o Google Apps Script</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:1rem;line-height:1.7">
+        No seu Google Sheets, acesse <strong style="color:var(--text)">Extensões → Apps Script</strong>,
+        cole o código abaixo e publique como <em>App da Web</em> com acesso de <em>Qualquer pessoa</em>.
+      </p>
+      <pre style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;font-size:11.5px;color:#a8d8a8;overflow-x:auto;line-height:1.7;font-family:monospace">function doPost(e) {
+  const d = JSON.parse(e.postData.contents);
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  // Aba: OC
+  let s = ss.getSheetByName('OC') || ss.insertSheet('OC');
+  s.clearContents();
+  s.appendRow(['Campus','Data','Tema','GC','Mensagem','Semanas','Aviso Telão']);
+  s.appendRow([d.meta.campus,d.meta.data,d.meta.tema,
+               d.meta.gc,d.meta.msg,d.meta.semanas,d.meta.aviso]);
+  s.appendRow([]);
+  s.appendRow(['Duração','Horário','Momento','Responsável','Vídeo/Som',
+               'Tipo Momento','Telão Central','Transmissão',
+               'Vídeo/Dança/Luz','GC Suspenso']);
+  d.rows.forEach(r => s.appendRow([
+    r.dur,r.hora,r.momento,r.resp,r.videosom,
+    r.tipo_momento,r.telao,r.transm,r.vdl,r.gc_susp
+  ]));
+
+  // Aba: Bandas
+  let sb = ss.getSheetByName('Bandas') || ss.insertSheet('Bandas');
+  sb.clearContents();
+  sb.appendRow(['Nome da Banda','Ministro Líder']);
+  d.bandas.forEach(b => sb.appendRow([b.nome, b.lider]));
+
+  // Aba: Pessoas
+  let sp = ss.getSheetByName('Pessoas') || ss.insertSheet('Pessoas');
+  sp.clearContents();
+  sp.appendRow(['Nome','Função','Telefone']);
+  d.pessoas.forEach(p => sp.appendRow([p.nome, p.func, p.tel]));
+
+  return ContentService.createTextOutput('ok')
+    .setMimeType(ContentService.MimeType.TEXT);
+}</pre>
+    </div>
+  </div>
+
+</main>
+
+<script>
+const DEFAULT_GS_URL = 'https://script.google.com/macros/s/AKfycbwOGzWeQG4yd8cSpN0wybYM4Lw-O6OCLX5JTKeHqiyZA5DChGQdm-stIHs-YV11kLx1/exec';
+
+const MOMENTOS = ['Boas-vindas','Intercessão','Dízimos','Comunicações','Ministração','Pregação','Encerramento','Música instrumental','Oração','Testemunho','Vídeo','Cronômetro','Outro'];
+const TIPOS = ['musica','palavra','video','encerramento','outro'];
+const TIPO_L = {musica:'Música',palavra:'Palavra',video:'Vídeo',encerramento:'Encerramento',outro:'Outro'};
+
+/* ── State ── */
+let bandas = [
+  {id:1, nome:'Banda Samuel', lider:'Samuel Costa'},
+  {id:2, nome:'Banda Jovem', lider:'Rafael Mendes'},
+];
+let pessoas = [
+  {id:1, nome:'Eloy Pedrosa', func:'Pastor', tel:''},
+  {id:2, nome:'Reginaldo Lucas', func:'Diácono', tel:''},
+  {id:3, nome:'Cristiane Bitencourt', func:'Voluntário', tel:''},
+  {id:4, nome:'Eli Marcel', func:'Pregador', tel:''},
+  {id:5, nome:'Liliane Costa', func:'Comunicações', tel:''},
+];
+let nextBId=3, nextPId=6;
+
+let rows = [
+  {id:1,dur:'00:01',hora:'19:59',momento:'Música Instrumental',resp:'Banda Samuel',videosom:'—',tipo_momento:'Música instrumental',telao:'—',transm:'—',vdl:'—',gc_susp:'—',tipo:'musica'},
+  {id:2,dur:'00:01',hora:'20:00',momento:'Cronômetro 60 segundos',resp:'—',videosom:'.Vídeo',tipo_momento:'Cronômetro',telao:'—',transm:'.Vídeo',vdl:'.Vídeo',gc_susp:'—',tipo:'video'},
+  {id:3,dur:'00:03',hora:'20:03',momento:'Boas-vindas',resp:'Eloy Pedrosa',videosom:'Mic Branco',tipo_momento:'Boas-vindas',telao:'.Bem-vindo',transm:'.Nome da pessoa',vdl:'—',gc_susp:'.Nome da pessoa',tipo:'outro'},
+  {id:4,dur:'00:01',hora:'20:04',momento:'Oração',resp:'Eloy Pedrosa',videosom:'Mic Branco',tipo_momento:'Intercessão',telao:'.Bem-vindo',transm:'—',vdl:'—',gc_susp:'.Boas-vindas',tipo:'outro'},
+  {id:5,dur:'00:05',hora:'20:09',momento:'Vida aos Sepulcros — Leo Schiappani',resp:'Banda Samuel',videosom:'',tipo_momento:'Ministração',telao:'.Vamos Adorar',transm:'.GC Nome / Letra',vdl:'—',gc_susp:'.Letra da Canção',tipo:'musica'},
+  {id:6,dur:'00:05',hora:'20:14',momento:'Grandes Coisas — Felipe Rodrigues',resp:'Banda Samuel',videosom:'',tipo_momento:'Ministração',telao:'.Vamos Adorar',transm:'.GC Nome / Letra',vdl:'—',gc_susp:'.Letra da Canção',tipo:'musica'},
+  {id:7,dur:'00:03',hora:'20:17',momento:'Fidelidade e Generosidade',resp:'Reginaldo Lucas',videosom:'Mic Preto',tipo_momento:'Dízimos',telao:'.Fidelidade e Generosidade',transm:'—',vdl:'—',gc_susp:'Salmos 128:1-2',tipo:'outro'},
+  {id:8,dur:'00:02',hora:'20:19',momento:'Tão Profundo — Vineyard',resp:'Banda Samuel',videosom:'',tipo_momento:'Ministração',telao:'.Vamos Adorar',transm:'.GC Nome / Letra',vdl:'—',gc_susp:'.Letra da Canção',tipo:'musica'},
+  {id:9,dur:'00:05',hora:'20:24',momento:'Testemunho',resp:'Cristiane Bitencourt',videosom:'Mic Branco',tipo_momento:'Testemunho',telao:'.Vidas Transformadas',transm:'—',vdl:'—',gc_susp:'—',tipo:'outro'},
+  {id:10,dur:'00:01',hora:'20:25',momento:'Vídeo Introdução 30 Semanas',resp:'—',videosom:'',tipo_momento:'Vídeo',telao:'.ID 30 Semanas',transm:'—',vdl:'.Vídeo',gc_susp:'—',tipo:'video'},
+  {id:11,dur:'00:25',hora:'20:50',momento:'Decisão (2): CONFIAR — "Confie em uma nova direção"',resp:'Eli Marcel',videosom:'Mic Preto',tipo_momento:'Pregação',telao:'.ID 30 Semanas / Base',transm:'.GC Nome / PPT',vdl:'—',gc_susp:'.GC Nome',tipo:'palavra'},
+  {id:12,dur:'00:05',hora:'20:55',momento:'Apelo e Oração',resp:'Eli Marcel',videosom:'Mic Preto',tipo_momento:'Encerramento',telao:'.Decida por uma nova vida',transm:'.QR Code Decisões',vdl:'—',gc_susp:'.GC Decisões',tipo:'encerramento'},
+  {id:13,dur:'00:02',hora:'20:57',momento:'Encerramento',resp:'Liliane Costa',videosom:'Mic Branco',tipo_momento:'Encerramento',telao:'.Comunicação',transm:'—',vdl:'—',gc_susp:'—',tipo:'encerramento'},
+  {id:14,dur:'00:03',hora:'21:00',momento:'Preparação para Grupos de Apoio',resp:'Todos os Voluntários',videosom:'',tipo_momento:'',telao:'.Boa Partilha',transm:'.Boa Partilha',vdl:'—',gc_susp:'.Mapa Grupos',tipo:'outro'},
+];
+let nextId=15, dragSrc=null;
+
+/* ── Config ── */
+function loadConfig(){
+  const url = localStorage.getItem('oc_gs_url') || DEFAULT_GS_URL;
+  document.getElementById('cfg-gsurl').value = url;
+}
+function saveConfig(){
+  const url = document.getElementById('cfg-gsurl').value.trim();
+  localStorage.setItem('oc_gs_url', url);
+  const s = document.getElementById('cfg-status');
+  s.style.display='inline';
+  setTimeout(()=>s.style.display='none', 2500);
+}
+function getGSUrl(){
+  return localStorage.getItem('oc_gs_url') || DEFAULT_GS_URL;
+}
+
+/* ── Tabs ── */
+function showTab(t, btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  btn.classList.add('active');
+  if(t==='oc') renderOC();
+  if(t==='bandas') renderBandas();
+  if(t==='pessoas') renderPessoas();
+}
+
+/* ── Options helpers ── */
+function respOptions(sel){
+  let o = '<option value="">—</option>';
+  if(bandas.length){
+    o += '<optgroup label="Bandas">';
+    bandas.forEach(b=>{ o+=`<option${sel===b.nome?' selected':''}>${b.nome}</option>`; });
+    o += '</optgroup>';
+  }
+  if(pessoas.length){
+    o += '<optgroup label="Pessoas">';
+    pessoas.forEach(p=>{ o+=`<option${sel===p.nome?' selected':''}>${p.nome}</option>`; });
+    o += '</optgroup>';
+  }
+  return o;
+}
+function momentoOpts(sel){
+  return '<option value="">—</option>'+MOMENTOS.map(m=>`<option${sel===m?' selected':''}>${m}</option>`).join('');
+}
+function tipoOpts(sel){
+  return TIPOS.map(t=>`<option value="${t}"${sel===t?' selected':''}>${TIPO_L[t]}</option>`).join('');
+}
+
+/* ── Render OC ── */
+function renderOC(){
+  const tbody = document.getElementById('oc-body');
+  tbody.innerHTML = '';
+  rows.forEach((r,i)=>{
+    const tr = document.createElement('tr');
+    tr.className = 'tipo-'+r.tipo;
+    tr.draggable = true;
+    tr.innerHTML = `
+      <td><span class="grip" title="Arrastar para reordenar"><i class="ti ti-grip-vertical"></i></span></td>
+      <td><input class="ci center" style="width:50px" value="${esc(r.dur)}" oninput="upd(${i},'dur',this.value)"></td>
+      <td><input class="ci center" style="width:48px" value="${esc(r.hora)}" oninput="upd(${i},'hora',this.value)"></td>
+      <td><input class="ci" value="${esc(r.momento)}" oninput="upd(${i},'momento',this.value)"></td>
+      <td><select class="ci" onchange="upd(${i},'resp',this.value)">${respOptions(r.resp)}</select></td>
+      <td><input class="ci" value="${esc(r.videosom)}" oninput="upd(${i},'videosom',this.value)"></td>
+      <td><select class="ci" onchange="upd(${i},'tipo_momento',this.value)">${momentoOpts(r.tipo_momento)}</select></td>
+      <td><input class="ci" value="${esc(r.telao)}" oninput="upd(${i},'telao',this.value)"></td>
+      <td><input class="ci" value="${esc(r.transm)}" oninput="upd(${i},'transm',this.value)"></td>
+      <td><input class="ci" value="${esc(r.vdl)}" oninput="upd(${i},'vdl',this.value)"></td>
+      <td><input class="ci" value="${esc(r.gc_susp)}" oninput="upd(${i},'gc_susp',this.value)"></td>
+      <td><button class="del-btn" onclick="delRow(${i})" title="Remover"><i class="ti ti-trash"></i></button></td>
+    `;
+    tr.addEventListener('dragstart', e=>{ dragSrc=i; tr.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; });
+    tr.addEventListener('dragend', ()=>{ tr.classList.remove('dragging'); document.querySelectorAll('tr.drag-over').forEach(el=>el.classList.remove('drag-over')); });
+    tr.addEventListener('dragover', e=>{ e.preventDefault(); tr.classList.add('drag-over'); });
+    tr.addEventListener('dragleave', ()=>tr.classList.remove('drag-over'));
+    tr.addEventListener('drop', e=>{
+      e.preventDefault(); tr.classList.remove('drag-over');
+      if(dragSrc===null||dragSrc===i)return;
+      const m=rows.splice(dragSrc,1)[0]; rows.splice(i,0,m); dragSrc=null; renderOC();
+    });
+    tbody.appendChild(tr);
+  });
+  recalc();
+}
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+function upd(i,f,v){ rows[i][f]=v; if(f==='tipo') renderOC(); else recalc(); }
+function delRow(i){ if(confirm('Remover este momento?')){ rows.splice(i,1); renderOC(); } }
+function addRow(){
+  const lastH = rows.length ? rows[rows.length-1].hora : '20:00';
+  rows.push({id:nextId++,dur:'00:05',hora:lastH,momento:'',resp:'',videosom:'',tipo_momento:'',telao:'',transm:'',vdl:'',gc_susp:'',tipo:'outro'});
+  renderOC();
+  setTimeout(()=>{
+    const trs = document.querySelectorAll('#oc-body tr');
+    if(trs.length) trs[trs.length-1].querySelectorAll('input')[2].focus();
+  }, 60);
+}
+
+/* ── Totals ── */
+function parseMins(s){ if(!s)return 0; const p=s.split(':'); return parseInt(p[0]||0)*60+parseInt(p[1]||0); }
+function fmtMins(m){ const h=Math.floor(m/60),mn=m%60; return h>0?`${h}h ${mn.toString().padStart(2,'0')}min`:`${mn}min`; }
+function addTime(hora,mins){ const p=hora.split(':'); let h=parseInt(p[0]||20),m=parseInt(p[1]||0)+mins; h+=Math.floor(m/60); m=m%60; return`${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`; }
+function recalc(){
+  const tot = rows.reduce((a,r)=>a+parseMins(r.dur),0);
+  const ini = rows.length ? rows[0].hora : '20:00';
+  document.getElementById('tot-dur').textContent = fmtMins(tot);
+  document.getElementById('tot-fim').textContent = addTime(ini,tot)+'hs';
+  document.getElementById('tot-n').textContent = rows.length;
+}
+
+/* ── Status ── */
+function setStatus(type,msg){
+  const bar = document.getElementById('status-bar');
+  bar.className = 'status-bar' + (type==='ok'?' status-ok':type==='err'?' status-err':type==='send'?' status-send':'');
+  bar.innerHTML = type==='send'
+    ? `<div class="spinner"></div><span>${msg}</span>`
+    : `<i class="ti ti-circle-check" style="font-size:14px"></i><span>${msg}</span>`;
+}
+
+/* ── Google Sheets ── */
+function sendGSheets(){
+  const url = getGSUrl();
+  if(!url){ alert('Configure a URL do Google Apps Script na aba Configurações.'); return; }
+  document.getElementById('btn-gs').disabled = true;
+  document.getElementById('btn-gs-top').disabled = true;
+  setStatus('send','Enviando para o Google Sheets…');
+  const meta = {
+    campus: document.getElementById('h-campus').value,
+    data:   document.getElementById('h-data').value,
+    tema:   document.getElementById('h-tema').value,
+    gc:     document.getElementById('h-gc').value,
+    msg:    document.getElementById('h-msg').value,
+    semanas:document.getElementById('h-sem').value,
+    aviso:  document.getElementById('h-aviso').value,
+  };
+  const payload = {meta, bandas, pessoas, rows: rows.map(r=>({...r, tipoLabel:TIPO_L[r.tipo]}))};
+  fetch(url,{method:'POST',mode:'no-cors',body:JSON.stringify(payload),headers:{'Content-Type':'application/json'}})
+    .then(()=>{
+      setStatus('ok','Salvo com sucesso no Google Sheets!');
+      document.getElementById('btn-gs').disabled=false;
+      document.getElementById('btn-gs-top').disabled=false;
+      setTimeout(()=>setStatus('','Pronto'),5000);
+    })
+    .catch(err=>{
+      setStatus('err','Erro ao enviar: '+err.message);
+      document.getElementById('btn-gs').disabled=false;
+      document.getElementById('btn-gs-top').disabled=false;
+    });
+}
+
+/* ── CSV ── */
+function exportCSV(){
+  const meta = [
+    document.getElementById('h-campus').value,
+    document.getElementById('h-data').value,
+    document.getElementById('h-tema').value,
+    document.getElementById('h-gc').value,
+    document.getElementById('h-msg').value,
+    document.getElementById('h-sem').value,
+  ];
+  let csv = 'Campus,Data,Tema,GC,Mensagem,Semanas\n"'+meta.join('","')+'"\n\n';
+  csv += 'Duração,Horário,Momento,Responsável,Vídeo/Som,Tipo Momento,Telão Central,Transmissão,Vídeo/Dança/Luz,GC Suspenso\n';
+  rows.forEach(r=>{
+    csv += `"${r.dur}","${r.hora}","${r.momento}","${r.resp}","${r.videosom}","${r.tipo_momento}","${r.telao}","${r.transm}","${r.vdl}","${r.gc_susp}"\n`;
+  });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  a.download = 'ordem-de-culto.csv';
+  a.click();
+  setStatus('ok','CSV exportado!');
+  setTimeout(()=>setStatus('','Pronto'),3000);
+}
+
+/* ── Bandas ── */
+function addBanda(){
+  const nome = document.getElementById('b-nome').value.trim();
+  const lider = document.getElementById('b-lider').value.trim();
+  if(!nome) return;
+  bandas.push({id:nextBId++, nome, lider});
+  document.getElementById('b-nome').value='';
+  document.getElementById('b-lider').value='';
+  renderBandas();
+}
+function delBanda(id){ bandas=bandas.filter(b=>b.id!==id); renderBandas(); }
+function renderBandas(){
+  const el = document.getElementById('lista-bandas');
+  if(!bandas.length){ el.innerHTML='<div class="empty">Nenhuma banda cadastrada ainda.</div>'; return; }
+  el.innerHTML = bandas.map(b=>`
+    <div class="list-item">
+      <div class="avatar banda"><i class="ti ti-music" style="font-size:15px"></i></div>
+      <div class="list-item-main">
+        <div class="list-item-name">${b.nome}</div>
+        <div class="list-item-sub"><i class="ti ti-user" style="font-size:11px;vertical-align:-1px;margin-right:3px"></i>Ministro líder: ${b.lider||'—'}</div>
+      </div>
+      <button class="btn btn-rose" style="font-size:11px;padding:5px 10px" onclick="delBanda(${b.id})">
+        <i class="ti ti-trash"></i> Remover
+      </button>
+    </div>
+  `).join('');
+}
+
+/* ── Pessoas ── */
+function addPessoa(){
+  const nome = document.getElementById('p-nome').value.trim();
+  const func = document.getElementById('p-func').value;
+  const tel  = document.getElementById('p-tel').value.trim();
+  if(!nome) return;
+  pessoas.push({id:nextPId++, nome, func, tel});
+  document.getElementById('p-nome').value='';
+  document.getElementById('p-func').value='';
+  document.getElementById('p-tel').value='';
+  renderPessoas();
+}
+function delPessoa(id){ pessoas=pessoas.filter(p=>p.id!==id); renderPessoas(); }
+function renderPessoas(){
+  const el = document.getElementById('lista-pessoas');
+  if(!pessoas.length){ el.innerHTML='<div class="empty">Nenhuma pessoa cadastrada ainda.</div>'; return; }
+  el.innerHTML = pessoas.map(p=>{
+    const ini = p.nome.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+    return `
+      <div class="list-item">
+        <div class="avatar">${ini}</div>
+        <div class="list-item-main">
+          <div class="list-item-name">${p.nome}</div>
+          <div class="list-item-sub">${p.func||'—'}${p.tel?' · '+p.tel:''}</div>
+        </div>
+        <button class="btn btn-rose" style="font-size:11px;padding:5px 10px" onclick="delPessoa(${p.id})">
+          <i class="ti ti-trash"></i> Remover
+        </button>
+      </div>
+    `;
+  }).join('');
+}
+
+/* ── Init ── */
+loadConfig();
+renderOC();
+renderBandas();
+renderPessoas();
+</script>
+</body>
+</html>
